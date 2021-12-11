@@ -2,6 +2,7 @@ package com.nowcoder.community.controller;
 
 import com.nowcoder.community.entity.User;
 import com.nowcoder.community.service.UserService;
+import com.nowcoder.community.util.CommunityConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,7 +14,7 @@ import javax.jws.WebParam;
 import java.util.Map;
 
 @Controller
-public class LoginController {
+public class LoginController implements CommunityConstant {
 
     @Autowired
     private UserService userService;
@@ -37,9 +38,10 @@ public class LoginController {
         }
         else
         {
-            model.addAttribute("usernameMsg", map.get("usernameMsg"));
+            model.addAttribute("usernameMsg", map.get("userNameMsg"));
             model.addAttribute("passwordMsg", map.get("passwordMsg"));
             model.addAttribute("emailMsg", map.get("emailMsg"));
+
             return "/site/register";
         }
     }
@@ -48,6 +50,22 @@ public class LoginController {
     @RequestMapping(path = "/activation/{userId}/{code}")
     public  String activation(Model model, @PathVariable("userId")int userId, @PathVariable("code")String code)
     {
-
+        int activation = userService.activation(userId, code);
+        if(activation==ACTIVATION_SUCCESS)
+        {
+            model.addAttribute("msg", "激活成功,您的账号已经可以正常使用了!");
+            model.addAttribute("target", "/login");
+        }
+        else  if(activation==ACTIVATION_REPEAT)
+        {
+            model.addAttribute("msg", "请勿重复激活");
+            model.addAttribute("target", "/index");
+        }
+        else
+        {
+            model.addAttribute("msg", "激活码错误，激活失败");
+            model.addAttribute("target", "/index");
+        }
+        return "/site/operate-result";
     }
 }

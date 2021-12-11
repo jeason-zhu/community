@@ -2,6 +2,7 @@ package com.nowcoder.community.service;
 
 import com.nowcoder.community.dao.UserMapper;
 import com.nowcoder.community.entity.User;
+import com.nowcoder.community.util.CommunityConstant;
 import com.nowcoder.community.util.CommunityUtil;
 import com.nowcoder.community.util.MailClient;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +18,7 @@ import java.util.Map;
 import java.util.Random;
 
 @Service
-public class UserService {
+public class UserService implements CommunityConstant {
 
 
 
@@ -33,6 +34,7 @@ public class UserService {
     public User findUserById(int id) {
         return userMapper.selectById(id);
     }
+
     //注册是校验用户数据的
     Map<String,Object> map = new HashMap<>();
     public Map<String,Object> register(User user)
@@ -65,7 +67,7 @@ public class UserService {
             return map;
         }
         u = userMapper.selectByEmail(user.getEmail());
-        if(StringUtils.isBlank((user.getEmail())))
+        if(u!=null)
         {
             map.put("emailMsg","该邮箱已被注册");
             return map;
@@ -95,12 +97,21 @@ public class UserService {
         return map;
     }
 
-    public int activation(int userId,int code)
+    //激活业务
+    public int activation(int userId,String code)
     {
         User user = userMapper.selectById(userId);
         if(user.getStatus()==1)
         {
-            
+            return ACTIVATION_REPEAT;
+        }
+        else if(user.getActivationCode().equals(code))
+        {
+            userMapper.updateStatus(user.getId(),1);
+            return ACTIVATION_SUCCESS;
+        }
+        else {
+            return  ACTIVATION_FAILURE;
         }
     }
 }
