@@ -18,4 +18,14 @@ public interface CommunityConstant {
      */
     int ACTIVATION_FAILURE = 2;
 
+    /**
+     * 默认登录凭证过期时间
+     */
+    int DEFAULT_EXPIRED_SECONDS = 60*60*12;
+
+    /**
+     * 勾选记住我   记住状态的登录凭证过期时间
+     */
+    int REMEMBER_EXPIRED_SECONDS = 60*60*24*100;
+
 }
